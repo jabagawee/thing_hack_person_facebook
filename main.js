@@ -35,7 +35,7 @@ function createPanel(HNurl) {
       var doc= tw_iframe.contentDocument;
       //response = response.replace(/<head>/, '<head><base target="_blank" href="'+TW_BASE+'"/>');
       response = response.replace(/<head>/, '<head><base href="'+base+'"/>');
-      response = response.replace('target="_parent"', '');
+      response = response.replace(/target="_parent"/g, '');
       doc.open();
       doc.write(response);
       doc.close();
