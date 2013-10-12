@@ -6,6 +6,7 @@ var backbutton = document.createElement("img");
 var tw_button= document.createElement("img");
 var rdt_button = document.createElement("img");
 var isRdt = true;
+var backcache;
 
 var currUrl = encodeURIComponent(document.URL);
 var redditSearch = "http://www.reddit.com/submit?url="+currUrl;
@@ -25,6 +26,7 @@ function doXHR(params, callback) {
 }
 
 function createPanel(HNurl) {
+  tw_iframe.src = "about:blank";
   doXHR({'action': 'get', 'url': HNurl}, function(response) {
       var base;
       if (isRdt) {
@@ -36,6 +38,7 @@ function createPanel(HNurl) {
       //response = response.replace(/<head>/, '<head><base target="_blank" href="'+TW_BASE+'"/>');
       response = response.replace(/<head>/, '<head><base href="'+base+'"/>');
       response = response.replace(/target="_parent"/g, '');
+      backcache = response;
       doc.open();
       doc.write(response);
       doc.close();
@@ -91,6 +94,7 @@ backbutton.onclick = function(event) {
   } else {
     createPanel(twitterSearch);
   }
+  
 };
 
 tw_button.src = chrome.extension.getURL("images/twitter.PNG");
