@@ -12,7 +12,9 @@
     "web_accessible_resources": [
         "jquery-1.10.2.min.map",
         "images/back.PNG",
-        "images/forward.PNG"
+        "images/forward.PNG",
+        "images/reddit.PNG",
+        "images/twitter.PNG"
     ],
     "background": {
         "scripts":["background.js"]
@@ -20,6 +22,7 @@
     "permissions": [
         "webRequest",
         "https://twitter.com/*",
+        "http://www.reddit.com/*",
         "webRequestBlocking"
     ]
 }

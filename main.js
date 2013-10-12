@@ -1,4 +1,15 @@
 var TW_BASE = "https://twitter.com";
+var RDT_BASE = "http://www.reddit.com";
+var popupContainer = document.createElement("div");
+var tw_iframe = document.createElement("iframe");
+var backbutton = document.createElement("img");
+var tw_button= document.createElement("img");
+var rdt_button = document.createElement("img");
+var isRdt = true;
+
+var currUrl = encodeURIComponent(document.URL);
+var redditSearch = "http://www.reddit.com/submit?url="+currUrl;
+var twitterSearch = "https://twitter.com/search?q="+currUrl;
 
 var port = chrome.extension.connect({}),
     callbacks = [];
@@ -14,19 +25,17 @@ function doXHR(params, callback) {
 }
 
 function createPanel(HNurl) {
-  if ($(".HNembed").length > 0) { return; } // avoid situations where multiple results might be triggered.
-
-  var HNembed = $("<div />").attr({'id' : 'HNembed'});
-  var HNsite = $("<iframe />").attr({'id' : 'HNsite', 'src' : 'about: blank'});
-
-  HNembed.append(HNsite);
-  //HNembed.hide();
-
-  $('body').append(HNembed);
-
   doXHR({'action': 'get', 'url': HNurl}, function(response) {
-      var doc = HNsite.get(0).contentDocument;
-      response = response.replace(/<head>/, '<head><base target="_blank" href="'+TW_BASE+'"/>');
+      var base;
+      if (isRdt) {
+        base = RDT_BASE;
+      } else {
+        base = TW_BASE;
+      }
+      var doc= tw_iframe.contentDocument;
+      //response = response.replace(/<head>/, '<head><base target="_blank" href="'+TW_BASE+'"/>');
+      response = response.replace(/<head>/, '<head><base href="'+base+'"/>');
+      response = response.replace('target="_parent"', '');
       doc.open();
       doc.write(response);
       doc.close();
@@ -34,20 +43,15 @@ function createPanel(HNurl) {
 }
 
 
-var popupContainer = document.createElement("div");
-var iframe = document.createElement("iframe");
-var backbutton = document.createElement("img");
 
-var currUrl = encodeURIComponent(document.URL);
-var redditSearch = "http://www.reddit.com/submit?url="+currUrl;
-var twitterSearch = "https://twitter.com/search?q="+currUrl;
 
 console.log(redditSearch);
 console.log(twitterSearch);
 
-createPanel(twitterSearch);
+//createPanel(twitterSearch);
+createPanel(redditSearch);
 
-iframe.setAttribute("src", redditSearch);
+//iframe.setAttribute("src", redditSearch);
 //iframe.setAttribute("src", twitterSearch);
 
 popupContainer.style.backgroundColor = "#CCCCCC";
@@ -55,16 +59,16 @@ popupContainer.style.position= "fixed";
 popupContainer.style.display = "none";
 popupContainer.style.width = "80%";
 popupContainer.style.height = "80%";
-popupContainer.style.top = "10%";
+popupContainer.style.top = "50px";
 popupContainer.style.left = "10%";
 popupContainer.style.zIndex = "2147483647";
 
 //iframe.sandbox = "allow-forms allow-scripts";
-iframe.style.position = "absolute";
-iframe.style.width = "100%";
-iframe.style.height= "95%";
-iframe.style.top= "5%";
-iframe.style.display = "none";
+tw_iframe.style.position = "absolute";
+tw_iframe.style.width = "100%";
+tw_iframe.style.height= "95%";
+tw_iframe.style.top= "50px";
+tw_iframe.style.display = "none";
 
 var backdrop = document.createElement("div");
 backdrop.style.backgroundColor = "black";
@@ -79,33 +83,59 @@ backdrop.style.top = "0px";
 backdrop.style.left= "0px";
 
 backbutton.src = chrome.extension.getURL("images/back.PNG");
-backbutton.style.height = "5%";
+backbutton.style.height = "50px";
 backbutton.onclick = function(event) {
   console.log("back");
-  iframe.src = redditSearch;
+  if (isRdt) {
+    createPanel(redditSearch);
+  } else {
+    createPanel(twitterSearch);
+  }
+};
+
+tw_button.src = chrome.extension.getURL("images/twitter.PNG");
+tw_button.style.height = "50px";
+tw_button.style.position = "relative";
+tw_button.style.right = "0px";
+tw_button.onclick = function(event) {
+  console.log("Twitter");
+  isRdt = false;
+  createPanel(twitterSearch);
+  };
+
+rdt_button.src = chrome.extension.getURL("images/reddit.PNG");
+rdt_button.style.height = "50px";
+rdt_button.style.position = "relative";
+rdt_button.style.right = "0px";
+rdt_button.onclick = function(event) {
+  console.log("Reddit");
+  isRdt = true;
+  createPanel(redditSearch);
   };
 
 document.body.appendChild(backdrop);
 document.body.appendChild(popupContainer);
 
 popupContainer.appendChild(backbutton);
-popupContainer.appendChild(iframe);
+popupContainer.appendChild(rdt_button);
+popupContainer.appendChild(tw_button);
+popupContainer.appendChild(tw_iframe);
 
 function toggleIframe() {
-  if(iframe.style.display == "block") {
-    iframe.style.display = "none";
+  if(backdrop.style.display == "block") {
+    tw_iframe.style.display = "none";
     backdrop.style.display = "none";
     popupContainer.style.display = "none";
   }
   else {
-    iframe.style.display = "block";
+    tw_iframe.style.display = "block";
     backdrop.style.display = "block";
     popupContainer.style.display = "block";
   }
 }
 
 function dismissIframe() {
-  iframe.style.display == "none";
+  tw_iframe.style.display == "none";
   backdrop.style.display == "none";
   popupContainer.style.display == "none";
 }
@@ -116,7 +146,7 @@ $(document).bind('keyup', function(e) {
     if(e.keyCode === 192 && !($(e.target).is("input") || $(e.target).is("textarea"))) {
         toggleIframe();
     }
-    if(e.keyCode === 27 && iframe.style.display == "block") {
+    if(e.keyCode === 27 && backdrop.style.display == "block") {
       dismissIframe();
     }
 });
