@@ -8,5 +8,18 @@
         "matches": ["<all_urls>"],
         "css": ["style.css"],
         "js": ["jquery-1.10.2.min.js", "main.js"]
-    }]
+    }],
+    "web_accessible_resources": [
+        "jquery-1.10.2.min.map",
+        "images/back.PNG",
+        "images/forward.PNG"
+    ],
+    "background": {
+        "scripts":["background.js"]
+    },
+    "permissions": [
+        "webRequest",
+        "https://twitter.com/*",
+        "webRequestBlocking"
+    ]
 }
