@@ -1,5 +1,5 @@
-//var iframe = document.createElement("iframe");
-var iframe = document.createElement("webview");
+var iframe = document.createElement("iframe");
+//var iframe = document.createElement("webview");
 
 var currUrl = encodeURIComponent(document.URL);
 var redditSearch = "http://www.reddit.com/submit?url="+currUrl;
