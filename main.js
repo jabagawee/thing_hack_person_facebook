@@ -1,16 +1,19 @@
 var TW_BASE = "https://twitter.com";
 var RDT_BASE = "http://www.reddit.com";
+var HN_BASE = "https://www.hnsearch.com";
 var popupContainer = document.createElement("div");
 var tw_iframe = document.createElement("iframe");
 var backbutton = document.createElement("img");
 var tw_button= document.createElement("img");
 var rdt_button = document.createElement("img");
-var isRdt = true;
+//var hn_button= document.createElement("img");
+var currSearch = 'rdt';
 var backcache;
 
 var currUrl = encodeURIComponent(document.URL);
 var redditSearch = "http://www.reddit.com/submit?url="+currUrl;
 var twitterSearch = "https://twitter.com/search?q="+currUrl;
+//var hnSearch = "https://www.hnsearch.com/search#request/all&q="+currUrl;
 
 var port = chrome.extension.connect({}),
     callbacks = [];
@@ -29,20 +32,25 @@ function createPanel(HNurl) {
   tw_iframe.src = "about:blank";
   doXHR({'action': 'get', 'url': HNurl}, function(response) {
       var base;
-      if (isRdt) {
-        base = RDT_BASE;
-      } else {
-        base = TW_BASE;
+      switch(currSearch) {
+        case 'rdt':
+          base = RDT_BASE;
+          break;
+        case 'tw':
+          base = TW_BASE;
+          break;
+        case 'hn':
+          base = HN_BASE;
+          break;
       }
       var doc= tw_iframe.contentDocument;
-      //response = response.replace(/<head>/, '<head><base target="_blank" href="'+TW_BASE+'"/>');
       response = response.replace(/<head>/, '<head><base href="'+base+'"/>');
       response = response.replace(/target="_parent"/g, '');
       backcache = response;
       doc.open();
       doc.write(response);
       doc.close();
-      });
+  });
 }
 
 
@@ -50,12 +58,9 @@ function createPanel(HNurl) {
 
 console.log(redditSearch);
 console.log(twitterSearch);
+//console.log(hnSearch);
 
-//createPanel(twitterSearch);
 createPanel(redditSearch);
-
-//iframe.setAttribute("src", redditSearch);
-//iframe.setAttribute("src", twitterSearch);
 
 popupContainer.style.backgroundColor = "#CCCCCC";
 popupContainer.style.position= "fixed";
@@ -65,6 +70,9 @@ popupContainer.style.height = "80%";
 popupContainer.style.top = "50px";
 popupContainer.style.left = "10%";
 popupContainer.style.zIndex = "2147483647";
+
+// Animation
+popupContainer.transition = "display 0.5s";
 
 //iframe.sandbox = "allow-forms allow-scripts";
 tw_iframe.style.position = "absolute";
@@ -89,12 +97,17 @@ backbutton.src = chrome.extension.getURL("images/back.PNG");
 backbutton.style.height = "50px";
 backbutton.onclick = function(event) {
   console.log("back");
-  if (isRdt) {
-    createPanel(redditSearch);
-  } else {
-    createPanel(twitterSearch);
+  switch(currSearch) {
+    case 'rdt':
+      createPanel(redditSearch);
+      break;
+    case 'tw':
+      createPanel(twitterSearch);
+      break;
+    case 'hn':
+      createPanel(hnSearch);
+      break;
   }
-  
 };
 
 tw_button.src = chrome.extension.getURL("images/twitter.PNG");
@@ -103,7 +116,7 @@ tw_button.style.position = "relative";
 tw_button.style.right = "0px";
 tw_button.onclick = function(event) {
   console.log("Twitter");
-  isRdt = false;
+  currSearch = 'tw';
   createPanel(twitterSearch);
   };
 
@@ -113,9 +126,21 @@ rdt_button.style.position = "relative";
 rdt_button.style.right = "0px";
 rdt_button.onclick = function(event) {
   console.log("Reddit");
-  isRdt = true;
+  currSearch = 'rdt';
   createPanel(redditSearch);
   };
+
+/*
+hn_button.src = chrome.extension.getURL("images/HN.gif");
+hn_button.style.height = "50px";
+hn_button.style.position = "relative";
+hn_button.style.right = "0px";
+hn_button.onclick = function(event) {
+  console.log("Hacker News");
+  currSearch = 'hn';
+  createPanel(hnSearch);
+  };
+  */
 
 document.body.appendChild(backdrop);
 document.body.appendChild(popupContainer);
@@ -123,6 +148,7 @@ document.body.appendChild(popupContainer);
 popupContainer.appendChild(backbutton);
 popupContainer.appendChild(rdt_button);
 popupContainer.appendChild(tw_button);
+//popupContainer.appendChild(hn_button);
 popupContainer.appendChild(tw_iframe);
 
 function toggleIframe() {

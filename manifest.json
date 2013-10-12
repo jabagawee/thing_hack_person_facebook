@@ -13,7 +13,8 @@
         "images/back.PNG",
         "images/forward.PNG",
         "images/reddit.PNG",
-        "images/twitter.PNG"
+        "images/twitter.PNG",
+        "images/HN.gif"
     ],
     "background": {
         "scripts":["background.js"]
@@ -22,6 +23,7 @@
         "webRequest",
         "https://twitter.com/*",
         "http://www.reddit.com/*",
+        "https://www.hnsearch.com/*",
         "webRequestBlocking"
     ]
 }
