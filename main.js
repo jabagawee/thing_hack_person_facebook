@@ -1,28 +1,28 @@
-// create the iframe
-var iframe = document.createElement("iframe");
+//var iframe = document.createElement("iframe");
+var iframe = document.createElement("webview");
 
-//iframe.setAttribute("src", "http://www.reddit.com/submit?url=http%3A%2F%2Fturntable.fm
-//var currUrl = escape(document.URL);
-var currUrl = "http://www.reddit.com/submit?url="+encodeURIComponent(document.URL);
-console.log(currUrl);
-iframe.setAttribute("src", currUrl);
-iframe.style.position= "absolute";
+var currUrl = encodeURIComponent(document.URL);
+var redditSearch = "http://www.reddit.com/submit?url="+currUrl;
+var twitterSearch = "https://twitter.com/search?q="+currUrl;
+console.log(twitterSearch);
+iframe.setAttribute("src", redditSearch);
+iframe.style.position= "fixed";
 iframe.style.display = "none";
-iframe.style.width = "50%";
+iframe.style.width = "80%";
 iframe.style.height = "80%";
 iframe.style.top = "10%";
-iframe.style.left = "25%";
-iframe.style.zIndex = "101";
+iframe.style.left = "10%";
+iframe.style.zIndex = "999";
 
 var backdrop = document.createElement("div");
 backdrop.style.backgroundColor = "black";
-backdrop.style.zIndex = "100";
+backdrop.style.zIndex = "998";
 backdrop.style.opacity= "0.5";
 backdrop.style.display= "none";
 backdrop.style.width= "100%";
 backdrop.style.height= "100%";
 backdrop.style.display= "100%";
-backdrop.style.position = "absolute";
+backdrop.style.position = "fixed";
 backdrop.style.top = "0px";
 backdrop.style.left= "0px";
 
